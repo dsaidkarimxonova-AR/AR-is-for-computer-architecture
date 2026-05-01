@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>AR Kompyuter Arxitekturasi - Dilnozaxon</title>
+    
+    <!-- A-Frame va MindAR kutubxonalari -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <style>
+      /* Yuklanish vaqtidagi interfeys */
+      #scanning-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        z-index: 10;
+        font-family: sans-serif;
+      }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+
+  <body>
+    <!-- Skanerlash haqida eslatma -->
+    <div id="scanning-overlay">
+      <p>Kamerani rasmga (markerga) qarating...</p>
+    </div>
+
+    <!-- AR sahnaviy qismi -->
+    <a-scene 
+      mindar-image="imageTargetSrc: ./targets.mind; showStats: false;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <!-- 3D modelingiz nomi (GitHub'ga yuklagan faylingiz bilan bir xil bo'lishi shart) -->
+        <a-asset-item id="myModel" src="./model.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Rasm topilganda (targetIndex: 0) model paydo bo'ladi -->
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- scale: model o'lchami, rotation: aylanish burchagi -->
+        <a-gltf-model 
+          src="#myModel" 
+          rotation="0 0 0" 
+          position="0 0 0" 
+          scale="0.5 0.5 0.5">
+        </a-gltf-model>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      // Rasm topilganda ekrandagi yozuvni yashirish
+      const sceneEl = document.querySelector('a-scene');
+      const overlay = document.querySelector('#scanning-overlay');
+      
+      sceneEl.addEventListener("targetFound", event => {
+        overlay.classList.add("hidden");
+      });
+
+      sceneEl.addEventListener("targetLost", event => {
+        overlay.classList.remove("hidden");
+      });
+    </script>
+  </body>
+</html>
